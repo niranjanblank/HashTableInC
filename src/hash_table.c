@@ -49,7 +49,7 @@ void ht_del_hash_table(ht_hash_table* ht){
     	ht_item* item = ht->items[i];
     	if(item != NULL){
       		ht_del_item(item);
-    		}
+    	}
     free(ht->items);
     free(ht);
     }
