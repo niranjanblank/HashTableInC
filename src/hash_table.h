@@ -7,7 +7,7 @@ typedef struct {
 
 // this struct will define a hashtable of having total size of "size" and
 // current number of items in hash table, which helps in resizing
-typdef struct {
+typedef struct {
   int size;
   int count;
   // pointer to an array of pointers to "ht_item"

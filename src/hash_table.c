@@ -41,3 +41,16 @@ static void ht_del_item(ht_item* item){
   // frees item to avoid dangling pointers
   free(item);
 }
+
+// delete entire hash table
+void ht_del_hash_table(ht_hash_table* ht){
+	// free all the items inside the hash table
+    for(int i=0; i < ht->size; i++){
+    	ht_item* item = ht->items[i];
+    	if(item != NULL){
+      		ht_del_item(item);
+    		}
+    free(ht->items);
+    free(ht);
+    }
+}
