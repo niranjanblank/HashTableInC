@@ -14,3 +14,9 @@ typedef struct {
   // this allows dynamic memory allocation
   ht_item **items;
 } ht_hash_table;
+
+// Function to create a new hash table
+ht_hash_table* ht_new();
+
+// Function to delete an existing hash table
+void ht_del_hash_table(ht_hash_table* ht);
