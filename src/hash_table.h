@@ -1,3 +1,8 @@
+#pragma once
+#define HT_PRIME_1 163
+#define HT_PRIME_2 157
+
+
 // This struct will store items containing key and value
 typedef struct {
   // using pointers for key and value allows dynamic memory allocation
