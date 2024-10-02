@@ -88,3 +88,23 @@ static int ht_get_hash(const char* s, const int num_buckets, const int attempt) 
   return (hash_a + attempt*(hash_b+1)) % num_buckets;
 }
 
+// method to insert into the hash table
+void ht_insert(ht_hash_table* ht, const char* key, const char* value) {
+  // add the key and value in the memory
+  ht_item* item = ht_new_item(key,value);
+  // generate the index in the hashtable to store the value at
+  int index = ht_get_hash(key, ht->size,0);
+  // to check if there is already a value at the given index
+  ht_item* curr_item = ht->items[index];
+  int i = 1;
+  // until we find a memory location in hashtable that is null, we run the loop
+  while (curr_item != NULL) {
+    index = ht_get_hash(item->key,ht->size,i);
+    curr_item = ht->items[index];
+    i++;
+  }
+  // store the item in the hash table at index
+  ht->items[index] = item;
+  // increase the count of items in the hashtable
+  ht->count++;
+}
