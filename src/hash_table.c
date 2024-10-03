@@ -5,6 +5,8 @@
 
 
 
+static ht_item HT_DELETED_ITEM = {NULL, NULL};
+
 // This functions returns pointer to the ht_item
 // This is static beacause it will only be called by code intrenal to the hash table
 static ht_item* ht_new_item(const char *key, const char *value){
@@ -97,8 +99,8 @@ void ht_insert(ht_hash_table* ht, const char* key, const char* value) {
   // to check if there is already a value at the given index
   ht_item* curr_item = ht->items[index];
   int i = 1;
-  // until we find a memory location in hashtable that is null, we run the loop
-  while (curr_item != NULL) {
+  // until we find a memory location in hashtable that is null or we find a deleted node, we run the loop
+  while (curr_item != NULL && curr_item != &HT_DELETED_ITEM) {
     index = ht_get_hash(item->key,ht->size,i);
     curr_item = ht->items[index];
     i++;
@@ -108,3 +110,54 @@ void ht_insert(ht_hash_table* ht, const char* key, const char* value) {
   // increase the count of items in the hashtable
   ht->count++;
 }
+
+// search
+char* ht_search(ht_hash_table* ht, const char*  key) {
+  // generate index from the key
+  int index = ht_get_hash(key, ht->size,0);
+  // get item stored at the generated index
+  ht_item* item = ht->items[index];
+  int i = 1;
+  // if item isnt NULL we check if we have found the matching key
+  while (item!= NULL) {
+    // if the provided key matches to the key stored in hash table, return the value
+    // checking if the item at the index isnt deleted item
+    if (item != &HT_DELETED_ITEM){
+      if (strcmp(item->key, key) == 0) {
+        return item-> value;
+      }
+    }
+    // else we try to generate hash again, as the data mightve be stored somewhere else due to collision
+    index = ht_get_hash(item->key, ht->size,i);
+    // get the item
+    item = ht->items[index];
+    //increase the attempt for hashing
+    i++;
+  }
+
+  // if we reach here, it means the key isnt available in the hashtable so return null
+  return NULL;
+}
+
+// delete
+void ht_delete(ht_hash_table* ht, const char* key) {
+  int index = ht_get_hash(key, ht->size,0);
+  ht_item* item = ht->items[index];
+  int i =1;
+  while (item!=NULL) {
+    // checking if the item at index isnt already deleted
+    if (item != &HT_DELETED_ITEM) {
+      if(strcmp(item->key, key) == 0) {
+        // if we found the item, delete it
+        ht_del_item(item);
+        ht->items[index] = &HT_DELETED_ITEM;
+      }
+    }
+    index = ht_get_hash(item->key, ht->size,i);
+    item = ht->items[index];;
+    i++;
+  }
+  // decrease the count of item in the hashtable
+  ht->count--;
+}
+
