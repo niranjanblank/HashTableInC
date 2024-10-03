@@ -101,6 +101,14 @@ void ht_insert(ht_hash_table* ht, const char* key, const char* value) {
   int i = 1;
   // until we find a memory location in hashtable that is null or we find a deleted node, we run the loop
   while (curr_item != NULL && curr_item != &HT_DELETED_ITEM) {
+    // if an item with key at the location is found
+    if (strcmp(curr_item->key, key) == 0) {
+      // delete this item
+      ht_del_item(curr_item);
+      // add the new item at the index
+      ht->items[index] = item;
+      return;
+    }
     index = ht_get_hash(item->key,ht->size,i);
     curr_item = ht->items[index];
     i++;
