@@ -2,7 +2,7 @@
 #include <string.h>
 #include <math.h>
 #include "hash_table.h"
-
+#include "prime.h"
 
 
 static ht_item HT_DELETED_ITEM = {NULL, NULL};
@@ -22,21 +22,21 @@ static ht_item* ht_new_item(const char *key, const char *value){
 }
 
 // This function initializes the hashtable
-ht_hash_table* ht_new(){
-  // allocate memory for the hashtable
-  ht_hash_table* ht = malloc(sizeof(ht_hash_table));
-
-  // set the size of the ht
-  ht->size = 53;
-  // current count of items in the ht
-  ht->count = 0;
-
-  // initialize arary of items
-  // 1st input to calloc is number of elements we want to allocate memory for
-  // 2nd input to calloc is size of each element in bytes
-  ht->items = calloc((size_t)ht->size, sizeof(ht_item*));
-  return ht;
-}
+// ht_hash_table* ht_new(){
+//   // allocate memory for the hashtable
+//   ht_hash_table* ht = malloc(sizeof(ht_hash_table));
+//
+//   // set the size of the ht
+//   ht->size = 53;
+//   // current count of items in the ht
+//   ht->count = 0;
+//
+//   // initialize arary of items
+//   // 1st input to calloc is number of elements we want to allocate memory for
+//   // 2nd input to calloc is size of each element in bytes
+//   ht->items = calloc((size_t)ht->size, sizeof(ht_item*));
+//   return ht;
+// }
 
 // delete hash table item
 static void ht_del_item(ht_item* item){
@@ -169,3 +169,17 @@ void ht_delete(ht_hash_table* ht, const char* key) {
   ht->count--;
 }
 
+//
+static ht_hash_table* ht_new_sized(const int base_size) {
+  ht_hash_table* ht = malloc(sizeof(ht_hash_table));
+
+  // calculate the next prime after base_size
+  ht->size = next_prime(base_size);
+  ht->count = 0;
+  ht->items = calloc((size_t)ht->size, sizeof(ht_item*));
+  return ht;
+}
+
+ht_hash_table* ht_new() {
+  return ht_new_sized(HT_INITIAL_BASE_SIZE);
+}
