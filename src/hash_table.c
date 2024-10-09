@@ -92,6 +92,13 @@ static int ht_get_hash(const char* s, const int num_buckets, const int attempt) 
 
 // method to insert into the hash table
 void ht_insert(ht_hash_table* ht, const char* key, const char* value) {
+  // resize if load is greater than 0.7
+  const int load = ht->count*100/ht->size;
+  if (load > 70){
+    ht_resize_up(ht);
+  }
+
+
   // add the key and value in the memory
   ht_item* item = ht_new_item(key,value);
   // generate the index in the hashtable to store the value at
@@ -149,6 +156,12 @@ char* ht_search(ht_hash_table* ht, const char*  key) {
 
 // delete
 void ht_delete(ht_hash_table* ht, const char* key) {
+  
+  const int load = ht->count * 100 / ht->size;
+  if (load < 10){
+    ht_resize_down(ht);
+  }
+
   int index = ht_get_hash(key, ht->size,0);
   ht_item* item = ht->items[index];
   int i =1;
@@ -172,9 +185,11 @@ void ht_delete(ht_hash_table* ht, const char* key) {
 //
 static ht_hash_table* ht_new_sized(const int base_size) {
   ht_hash_table* ht = malloc(sizeof(ht_hash_table));
+  
+  ht->base_size = base_size;
 
   // calculate the next prime after base_size
-  ht->size = next_prime(base_size);
+  ht->size = next_prime(ht->base_size);
   ht->count = 0;
   ht->items = calloc((size_t)ht->size, sizeof(ht_item*));
   return ht;
@@ -183,3 +198,51 @@ static ht_hash_table* ht_new_sized(const int base_size) {
 ht_hash_table* ht_new() {
   return ht_new_sized(HT_INITIAL_BASE_SIZE);
 }
+
+// resizing the hash_table
+static void ht_resize(ht_hash_table* ht, const int base_size){
+  if(base_size < HT_INITIAL_BASE_SIZE){
+  // cannot resize in this position
+    return;
+  }
+
+  ht_hash_table* new_ht = ht_new_sized(base_size);
+  // putting the content of previous hash_table in this hash_taboe
+  
+  for(int i; i < ht->size; i++){
+    ht_item* item = ht->items[i];
+      if(item != NULL && item != &HT_DELETED_ITEM){
+          ht_insert(new_ht, item->key, item->value);
+      }
+  }
+  ht->base_size = new_ht->base_size;
+  ht->count = new_ht->count;
+
+  // swap the size and items of new_ht and ht 
+  // and then delete new_ht
+  const int tmp_size = ht-> size;
+  ht->size = new_ht->size;
+  new_ht->size = tmp_size;
+
+  ht_item** tmp_items = ht->items;
+  ht->items = new_ht->items
+  new_ht->items = tmp_items;
+  ht_del_hash_table(new_ht);
+}
+
+
+// function to resize the hash table up
+static void ht_resize_up(ht_hash_table* ht){
+  // setting the new_size to be double of base size
+  const int new_size = ht->size * 2;
+  ht_resize(ht, new_size);
+}
+
+// resize down
+static void ht_resize_down(ht_hash_table* ht){
+  // decreasing the size by half
+  const int new_size = ht->size/2;
+  ht_resize_down(ht, new_size);
+}
+
+

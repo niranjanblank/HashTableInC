@@ -16,6 +16,7 @@ typedef struct {
 typedef struct {
   int size;
   int count;
+  int base_size;
   // pointer to an array of pointers to "ht_item"
   // this allows dynamic memory allocation
   ht_item **items;
